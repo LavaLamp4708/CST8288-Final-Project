@@ -23,7 +23,7 @@ public class RequestDAOImpl implements RequestDAO{
         SQLException
     {
         Class.forName(
-            "oracle.jdbc.driver.OracleDriver"
+            "com.mysql.cj.jdbc.Driver"
         );
         connection = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/AcademicExchangePlatform", 
