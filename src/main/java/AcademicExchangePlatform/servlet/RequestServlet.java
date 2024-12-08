@@ -172,10 +172,6 @@ public class RequestServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        
-        //testing params
-        request.setAttribute("userType", "AcademicProfessional");
-        request.setAttribute("userId", 2);
 
         try {
             String userType = getStringAttribute(request, "userType");
