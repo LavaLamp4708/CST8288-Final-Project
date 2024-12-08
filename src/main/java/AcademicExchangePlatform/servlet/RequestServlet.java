@@ -173,13 +173,16 @@ public class RequestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
+        request.setAttribute("userType", "AcademicProfessional");
+        request.setAttribute("userId", 2);
+
         try {
             String userType = getStringAttribute(request, "userType");
             int userId = getIntFromAttribute(request, "userId");
             int courseId = getIntFromAttribute(request, "courseId");
 
             if (userId == -1) return;
-            if ("AcademicInsytitution".equals(userType) && courseId == -1) return;
+            if ("AcademicInstitution".equals(userType) && courseId == -1) return;
 
             String targetPage = determineTargetPage(userType);
             if (targetPage == null) {

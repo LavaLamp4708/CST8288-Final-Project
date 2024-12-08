@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import AcademicExchangePlatform.model.DatabaseConnection;
 import AcademicExchangePlatform.model.Request;
 
 /**
@@ -22,14 +23,7 @@ public class RequestDAOImpl implements RequestDAO{
         ClassNotFoundException, 
         SQLException
     {
-        Class.forName(
-            "com.mysql.cj.jdbc.Driver"
-        );
-        connection = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3308/AcademicExchangePlatform", 
-            "AcademicExchangePlatform", 
-            "password"
-        );
+        connection = DatabaseConnection.getInstance().getConnection();
     }
 
     public static RequestDAO getInstance() 
