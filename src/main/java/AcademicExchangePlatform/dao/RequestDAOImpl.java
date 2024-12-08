@@ -9,10 +9,21 @@ import AcademicExchangePlatform.model.DatabaseConnection;
 import AcademicExchangePlatform.model.Request;
 
 /**
- * Implementation of the RequestDAO interface.
- * @author Peter Stainforth
+ * Implementation of the {@link RequestDAO} interface for managing course application requests
+ * in the Academic Exchange Platform.
+ * 
+ * <p>This class uses a singleton design pattern to ensure a single instance of the DAO is
+ * created. It provides methods to add, retrieve, update, and delete requests stored in the
+ * database.</p>
+ * 
+ * <p><b>Note:</b> This class interacts directly with the database and depends on the
+ * {@link DatabaseConnection} class to manage the connection.</p>
+ * 
+ * <p><b>Author:</b> Peter Stainforth</p>
+ * 
+ * @see RequestDAO
+ * @see AcademicExchangePlatform.model.DatabaseConnection
  */
-
 public class RequestDAOImpl implements RequestDAO{
 
     private Connection connection;
@@ -26,6 +37,13 @@ public class RequestDAOImpl implements RequestDAO{
         connection = DatabaseConnection.getInstance().getConnection();
     }
 
+    /**
+     * Returns the singleton instance of {@code RequestDAOImpl}.
+     * 
+     * @return the singleton instance of {@link RequestDAO}.
+     * @throws ClassNotFoundException if the database driver class is not found.
+     * @throws SQLException if a database access error occurs.
+     */
     public static RequestDAO getInstance() 
     throws 
         ClassNotFoundException, 
@@ -41,6 +59,12 @@ public class RequestDAOImpl implements RequestDAO{
         return dao;
     }
 
+    /**
+     * Adds a new request to the database.
+     * 
+     * @param request the {@link Request} object containing the request details.
+     * @return {@code true} if the request was successfully added, {@code false} otherwise.
+     */
     @Override
     public boolean addRequest(Request request) {
 
@@ -69,6 +93,12 @@ public class RequestDAOImpl implements RequestDAO{
         
     }
 
+    /**
+     * Retrieves a request from the database by its ID.
+     * 
+     * @param requestId the ID of the request to retrieve.
+     * @return the {@link Request} object if found, or {@code null} if not found.
+     */
     @Override
     public Request getRequestById(int requestId) {
         Request request = null;
@@ -99,6 +129,11 @@ public class RequestDAOImpl implements RequestDAO{
         return request;
     }
 
+    /**
+     * Cancels a request by deleting it from the database.
+     * 
+     * @param requestId the ID of the request to cancel.
+     */
     @Override
     public void cancelRequestById(int requestId){
         String query = "DELETE FROM courseapplications WHERE applicationId = ?";
@@ -111,6 +146,12 @@ public class RequestDAOImpl implements RequestDAO{
         }
     }
 
+    /**
+     * Retrieves all requests associated with a specific course.
+     * 
+     * @param courseId the ID of the course.
+     * @return a {@link List} of {@link Request} objects for the specified course.
+     */
     @Override
     public List<Request> getRequestByCourse(int courseId) {
         List<Request> list = new ArrayList<Request>();
@@ -143,6 +184,12 @@ public class RequestDAOImpl implements RequestDAO{
         return list;
     }
 
+    /**
+     * Retrieves all requests submitted by a specific user.
+     * 
+     * @param userId the ID of the user.
+     * @return a {@link List} of {@link Request} objects submitted by the user.
+     */
     @Override
     public List<Request> getRequestByUserId(int userId){
         List<Request> list = new ArrayList<Request>();
@@ -179,6 +226,13 @@ public class RequestDAOImpl implements RequestDAO{
         return list;
     }
 
+    /**
+     * Updates the status of a specific request.
+     * 
+     * @param requestId the ID of the request to update.
+     * @param status the new status to set for the request (e.g., "PENDING", "ACCEPTED", "REJECTED").
+     * @return {@code true} if the update was successful, {@code false} otherwise.
+     */
     @Override
     public boolean updateRequestStatus(int requestId, String status) {
         String query = "UPDATE courseapplications SET status = ? WHERE applicationId = ?";
