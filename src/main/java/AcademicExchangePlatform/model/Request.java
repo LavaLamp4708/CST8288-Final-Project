@@ -8,11 +8,20 @@ import java.util.Date;
 public class Request {
     private int requestId;
     private int courseId;
-    private String courseTitle;
     private int professionalId;
     private String status;
     private Date requestDate;
     private Date decisionDate;
+
+    //courses table attributes
+    private String courseTitle;
+    private String courseCode;
+    private String term;
+    private String schedule;
+    private String deliveryMethod;
+
+    //academic institution name
+    private String academicInstitutionName;
 
     public Request(
         int requestId, 
@@ -92,5 +101,45 @@ public class Request {
 
     public void setCourseTitle(String courseTitle) {
         this.courseTitle = courseTitle;
+    }
+
+    public String getCourseCode() {
+        return this.courseCode;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public String getTerm() {
+        return this.term;
+    }
+
+    public void setTerm(String term) {
+        this.term = term;
+    }
+
+    public String getSchedule() {
+        return this.schedule;
+    }
+
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
+    }
+
+    public String getDeliveryMethod() {
+        return this.deliveryMethod;
+    }
+
+    public void setDeliveryMethod(String deliveryMethod) {
+        this.deliveryMethod = deliveryMethod;
+    }
+
+    public String getAcademicInstitutionName() {
+        return this.academicInstitutionName;
+    }
+
+    public void setAcademicInstitutionName(String academicInstitutionName) {
+        this.academicInstitutionName = academicInstitutionName;
     }
 }

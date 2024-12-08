@@ -26,7 +26,7 @@ public class RequestDAOImpl implements RequestDAO{
             "com.mysql.cj.jdbc.Driver"
         );
         connection = DriverManager.getConnection(
-            "jdbc:mysql://localhost:3306/AcademicExchangePlatform", 
+            "jdbc:mysql://localhost:3308/AcademicExchangePlatform", 
             "AcademicExchangePlatform", 
             "password"
         );
@@ -54,7 +54,7 @@ public class RequestDAOImpl implements RequestDAO{
         String requestDate = mysqlDateFormat.format(request.getRequestDate());
         String decisionDate = mysqlDateFormat.format(request.getDecisionDate());
 
-        String query = "INSERT INTO Requests(courseId, professionalId, statis, requestDate, decisionDate)"
+        String query = "INSERT INTO courseapplications(courseId, professionalId, statis, requestDate, decisionDate)"
             + "VALUES(?,?,?,?,?)";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)){
@@ -79,13 +79,13 @@ public class RequestDAOImpl implements RequestDAO{
     public Request getRequestById(int requestId) {
         Request request = null;
 
-        String query = "SELECT * FROM Requests WHERE requestId = ?";
+        String query = "SELECT * FROM courseapplications WHERE applicationId = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)){
             preparedStatement.setInt(1,requestId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
-                Timestamp requestDateTS = resultSet.getTimestamp("requestDate");
+                Timestamp requestDateTS = resultSet.getTimestamp("applicationDate");
                 Timestamp decisionDateTS = resultSet.getTimestamp("decisionDate");
                 Date requestDate = (requestDateTS == null) ? null: new Date(requestDateTS.getTime());
                 Date decisionDate = (decisionDateTS == null) ? null : new Date(decisionDateTS.getTime());
@@ -107,7 +107,7 @@ public class RequestDAOImpl implements RequestDAO{
 
     @Override
     public void cancelRequestById(int requestId){
-        String query = "DELETE FROM Requests WHERE requestId = ?";
+        String query = "DELETE FROM courseapplications WHERE applicationId = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)){
             preparedStatement.setInt(1, requestId);
@@ -121,20 +121,20 @@ public class RequestDAOImpl implements RequestDAO{
     public List<Request> getRequestByCourse(int courseId) {
         List<Request> list = new ArrayList<Request>();
 
-        String query = "SELECT * FROM Requests WHERE courseId = ?";
+        String query = "SELECT * FROM courseapplications WHERE courseId = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)){
             preparedStatement.setInt(1, courseId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                Timestamp requestDateTS = resultSet.getTimestamp("requestDate");
+                Timestamp requestDateTS = resultSet.getTimestamp("applicationDate");
                 Timestamp decisionDateTS = resultSet.getTimestamp("decisionDate");
                 Date requestDate = (requestDateTS == null) ? null: new Date(requestDateTS.getTime());
                 Date decisionDate = (decisionDateTS == null) ? null : new Date(decisionDateTS.getTime());
 
                 list.add(
                     new Request(
-                        resultSet.getInt("requestId"),
+                        resultSet.getInt("applicationId"),
                         resultSet.getInt("courseId"),
                         resultSet.getInt("professionalId"),
                         resultSet.getString("status"),
@@ -153,25 +153,30 @@ public class RequestDAOImpl implements RequestDAO{
     public List<Request> getRequestByUserId(int userId){
         List<Request> list = new ArrayList<Request>();
 
-        String query = "SELECT * FROM Requests JOIN Courses ON Requests.courseId = Courses.courseId WHERE userId = ?";
+        String query = "SELECT * FROM courseapplications AS ca JOIN courses AS c ON ca.courseId = c.courseId JOIN academicinstitutions AS ai ON c.institutionId = ai.userId WHERE ca.professionalId = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)){
             preparedStatement.setInt(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                Timestamp requestDateTS = resultSet.getTimestamp("requestDate");
-                Timestamp decisionDateTS = resultSet.getTimestamp("decisionDate");
+                Timestamp requestDateTS = resultSet.getTimestamp("ca.applicationDate");
+                Timestamp decisionDateTS = resultSet.getTimestamp("ca.decisionDate");
                 Date requestDate = (requestDateTS == null) ? null: new Date(requestDateTS.getTime());
                 Date decisionDate = (decisionDateTS == null) ? null : new Date(decisionDateTS.getTime());
                 Request request = new Request(
-                        resultSet.getInt("requestId"),
-                        resultSet.getInt("courseId"),
-                        resultSet.getInt("professionalId"),
-                        resultSet.getString("status"),
+                        resultSet.getInt("ca.applicationId"),
+                        resultSet.getInt("ca.courseId"),
+                        resultSet.getInt("ca.professionalId"),
+                        resultSet.getString("ca.status"),
                         requestDate,
                         decisionDate
                     );
-                request.setCourseTitle(resultSet.getString("courseTitle"));
+                request.setCourseTitle(resultSet.getString("c.courseTitle"));
+                request.setCourseCode(resultSet.getString("c.courseCode"));
+                request.setTerm(resultSet.getString("c.term"));
+                request.setSchedule(resultSet.getString("c.schedule"));
+                request.setDeliveryMethod(resultSet.getString("c.deliveryMethod"));
+                request.setAcademicInstitutionName(resultSet.getString("ai.institutionName"));
                 list.add(request);
             }
         } catch (SQLException e){
@@ -182,7 +187,7 @@ public class RequestDAOImpl implements RequestDAO{
 
     @Override
     public boolean updateRequestStatus(int requestId, String status) {
-        String query = "UPDATE Requests SET status = ? WHERE requestId = ?";
+        String query = "UPDATE courseapplications SET status = ? WHERE applicationId = ?";
 
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)){
             preparedStatement.setString(1, status);

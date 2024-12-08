@@ -10,7 +10,7 @@ import javax.servlet.http.*;
 import AcademicExchangePlatform.model.Request;
 import AcademicExchangePlatform.service.RequestService;
 
-
+@WebServlet("/Requests")
 public class RequestServlet extends HttpServlet {
 
     private final RequestService requestService = RequestService.getInstance();
@@ -67,6 +67,30 @@ public class RequestServlet extends HttpServlet {
         return new ArrayList<>(requests.subList(start, end));
     }
 
+    private List<Request> filterAcceptedOnly(List<Request> requests){
+        List<Request> filtered = new ArrayList<Request>();
+        for(Request acceptedRequest : requests){
+            if(acceptedRequest.getStatus().equals("ACCEPTED")) filtered.add(acceptedRequest);
+        }
+        return filtered;
+    }
+
+    private List<Request> filterRejectedOnly(List<Request> requests){
+        List<Request> filtered = new ArrayList<Request>();
+        for(Request acceptedRequest : requests){
+            if(acceptedRequest.getStatus().equals("REJECTED")) filtered.add(acceptedRequest);
+        }
+        return filtered;
+    }
+
+    private List<Request> filterPendingOnly(List<Request> requests){
+        List<Request> filtered = new ArrayList<Request>();
+        for(Request acceptedRequest : requests){
+            if(acceptedRequest.getStatus().equals("PENDING")) filtered.add(acceptedRequest);
+        }
+        return filtered;
+    }
+
     private void dispatchPage(HttpServletRequest request, HttpServletResponse response, int userId, int courseId, String userType, String targetPage) throws ServletException, IOException {
         switch(userType){
             case "AcademicInstitution":
@@ -82,6 +106,15 @@ public class RequestServlet extends HttpServlet {
             case "AcademicProfessional":
                 try{
                     List<Request> requestsByUserId = this.requestService.getRequestByUserId(userId);
+
+                    //filter list
+                    if(request.getParameter("status") != null){
+                        String status = request.getParameter("status");
+                        if(status.equals("ACCEPTED")) requestsByUserId = filterAcceptedOnly(requestsByUserId);
+                        if(status.equals("REJECTED")) requestsByUserId = filterRejectedOnly(requestsByUserId);
+                        if(status.equals("PENDING")) requestsByUserId = filterPendingOnly(requestsByUserId);
+                    }
+
                     List<Request> paginatedRequests = paginateRequests(request, requestsByUserId);
                     request.setAttribute("requestsByUserId", paginatedRequests);
                     request.getRequestDispatcher("/WEB-INF/views/request/myRequests.jsp").forward(request, response);
@@ -134,9 +167,16 @@ public class RequestServlet extends HttpServlet {
      * doGet
      * @param request
      * @param response
+     * @throws IOException
+     * @throws ServletException
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        
+        //testing params
+        request.setAttribute("userType", "AcademicProfessional");
+        request.setAttribute("userId", 2);
+
         try {
             String userType = getStringAttribute(request, "userType");
             int userId = getIntFromAttribute(request, "userId");

@@ -2,6 +2,8 @@
 <c:set var="title" value="My Requests" scope="request"/>
 <%@ include file="../../common/header.jsp" %>
 
+<!-- Author: Peter Stainforth -->
+
 <div class="container">
     <h2>My Course Requests</h2>
     
@@ -14,7 +16,6 @@
                     <option value="PENDING" ${param.status == 'PENDING' ? 'selected' : ''}>Pending</option>
                     <option value="ACCEPTED" ${param.status == 'ACCEPTED' ? 'selected' : ''}>Accepted</option>
                     <option value="REJECTED" ${param.status == 'REJECTED' ? 'selected' : ''}>Rejected</option>
-                    <option value="CANCELLED" ${param.status == 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
                 </select>
             </div>
         </form>
@@ -25,6 +26,10 @@
             <thead>
                 <tr>
                     <th>Course Title</th>
+                    <th>Course Code</th>
+                    <th>Academic Institution</th>
+                    <th>Term</th>
+                    <th>Schedule</th>
                     <th>Status</th>
                     <th>Request Date</th>
                     <th>Decision Date</th>
@@ -35,6 +40,10 @@
                 <c:forEach items="${requestsByUserId}" var="request">
                     <tr>
                         <td>${request.courseTitle}</td>
+                        <td>${request.courseCode}</td>
+                        <td>${request.academicInstitutionName}</td>
+                        <td>${request.schedule}</td>
+                        <td>${request.deliveryMethod}</td>
                         <td><span class="status-${fn:toLowerCase(request.status)}">${request.status}</span></td>
                         <td>${request.requestDate}</td>
                         <td>${request.decisionDate}</td>
